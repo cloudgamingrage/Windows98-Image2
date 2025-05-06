@@ -18,8 +18,12 @@ window.onload = function()
         vga_bios: {
             url: "vgabios.bin",
         },
-        hdd: {
-            url: "Windows98.img",
+        hda: {
+            url: host + "Windows98/.img",
+            size: 300 * 1024 * 1024,
+            async: true,
+            fixed_chunk_size: 256 * 1024,
+            use_parts: true,
         },
         autostart: true,
     });
