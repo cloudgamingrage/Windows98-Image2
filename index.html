@@ -1,35 +1,51 @@
 <!doctype html>
-<title>Basic Emulator</title><!-- not BASIC! -->
+<title>Basic Emulator</title>
 
 <script src="libv86.js"></script>
 <script>
 "use strict";
-window.onload = function()
-{
-    var emulator = window.emulator = new V86({
-        wasm_path: "/Windows98-Image2/build/v86.wasm",
-        memory_size: 32 * 1024 * 1024,
-        vga_memory_size: 2 * 1024 * 1024,
-        screen_container: document.getElementById("screen_container"),
-        bios: {
-            url: "seabios.bin",
-        },
-        vga_bios: {
-            url: "vgabios.bin",
-        },
-        hda: {
-            url: "https://www.fnode.eu.org/Windows98-Image2/Windows98.img",
-            size: 300 * 1024 * 1024,
-            async: true,
-            fixed_chunk_size: 256 * 1024,
-            use_parts: false,
-        },
-        autostart: true,
+
+let emulator;
+
+window.onload = function() {
+    const fileInput = document.getElementById("disk_image");
+
+    fileInput.addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            emulator = window.emulator = new V86({
+                wasm_path: "../build/v86.wasm",
+                memory_size: 32 * 1024 * 1024,
+                vga_memory_size: 2 * 1024 * 1024,
+                screen_container: document.getElementById("screen_container"),
+                bios: {
+                    url: "seabios.bin",
+                },
+                vga_bios: {
+                    url: "vgabios.bin",
+                },
+                hda: {
+                    buffer: reader.result,
+                },
+                autostart: true,
+            });
+        };
+        reader.readAsArrayBuffer(file);
     });
-}
+};
 </script>
 
-<!-- A minimal structure for the ScreenAdapter defined in browser/screen.js -->
+<!-- File Upload Input -->
+<p>
+    <label>Select disk image:
+        <input type="file" id="disk_image" accept=".img">
+    </label>
+</p>
+
+<!-- Emulator Screen Container -->
 <div id="screen_container">
     <div style="white-space: pre; font: 14px monospace; line-height: 14px"></div>
     <canvas style="display: none"></canvas>
